@@ -163,10 +163,13 @@ PlayCommand = (searchTerm, message) => {
     message.member.voiceChannel
       .join()
       .then(connection => {
-        // Connection is an instance of VoiceConnection
-        console.log(ytAudioQueue[0]);
-        // To play a file, we need to give an absolute path to it
+        console.log(ytAudioQueue)
+        if (ytAudioQueue.length > 1) {
+          ytAudioQueue.pop();
+          console.log(ytAudioQueue)
         PlayStream(ytAudioQueue[0]);
+        message.channel.send("Now playing...\n" + ytAudioQueue[0])
+        }
       })
       .catch(console.log);
   } else {
@@ -181,7 +184,6 @@ testCommand = message => {
 /* END COMMAND HANDLERS */
 
 
-
 /* METHODS */
 
 YoutubeSearch = searchKeywords => {
@@ -193,12 +195,13 @@ YoutubeSearch = searchKeywords => {
       { params: { key: process.env.YT_API_KEY } }
     )
     .then(response => {
-      var body = response.data;
-      if (body.items.length == 0) {
+      var body = response.data.items;
+      if (body.length == 0) {
         console.log("Your search gave 0 results");
         return videoId;
       }
-      for (var item of body.items) {
+      console.log(body[0].id.videoId)
+      for (var item of body) {
         if (item.id.kind === "youtube#video") {
           QueueYtAudioStream(item.id.videoId);
         }
@@ -216,6 +219,7 @@ YoutubeSearch = searchKeywords => {
 
 QueueYtAudioStream = videoId => {
   var streamUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  ytAudioQueue.push(streamUrl);
 };
 
 PlayStream = streamUrl => {
