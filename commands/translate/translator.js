@@ -5,7 +5,7 @@ class TranslateCommand extends commando.Command {
   constructor(client) {
     super(client, {
       name: "translate",
-      group: "helper",
+      group: "translate",
       memberName: "translate",
       description: `Use !translate <Your words>`
     });

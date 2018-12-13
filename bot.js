@@ -1,17 +1,32 @@
 const Commando = require("discord.js-commando");
 const axios = require("axios");
 const ytdl = require("ytdl-core");
+const path = require("path");
 require("dotenv").config();
-const bot = new Commando.Client();
 
-bot.registry.registerGroup("simple", "Simple");
-bot.registry.registerGroup("helper", "Helper");
-bot.registry.registerGroup("music", "Music");
-bot.registry.registerGroup("team", "Team");
-bot.registry.registerCommandsIn(__dirname + "/commands");
+const bot = new Commando.Client({
+  commandPrefix: "!",
+  owner: process.env.BOT_OWNER,
+  disableEveryone: false,
+  unknownCommandResponse: true
+});
+
+bot.registry
+  .registerDefaultTypes()
+  .registerGroups([
+    ["simple", "Simple"],
+    ["translate", "Translate"],
+    ["music", "Music"],
+    ["team", "Team"],
+    ["wow", "WoW"]
+  ])
+  .registerDefaultGroups()
+  .registerDefaultCommands()
+  .registerCommandsIn(path.join(__dirname, "commands"));
 
 global.servers = [];
 global.currentTeamMembers = [];
+global.pvpLadder = [];
 
 // What to do when ready
 bot.on("ready", () => {
@@ -19,7 +34,7 @@ bot.on("ready", () => {
   console.log("Logged in as: ");
   console.log(bot.user.username + " - (" + bot.user.id + ")");
   console.log("System is online");
-  bot.user.setActivity("Life");
+  bot.user.setActivity("Test");
 });
 
 bot.on("guildMemberAdd", member => {
