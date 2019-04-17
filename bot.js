@@ -1,6 +1,4 @@
 const Commando = require("discord.js-commando");
-const axios = require("axios");
-const ytdl = require("ytdl-core");
 const path = require("path");
 require("dotenv").config();
 
@@ -15,7 +13,7 @@ bot.registry
   .registerDefaultTypes()
   .registerGroups([
     ["simple", "Simple"],
-    ["translate", "Translate"],
+    ["language", "Language"],
     ["music", "Music"],
     ["team", "Team"],
     ["wow", "WoW"]
@@ -82,88 +80,5 @@ bot.on("message", message => {
     message.member.addRole(memberRole);
   }
 });
-
-PlayCommand = (searchTerm, message) => {
-  if (searchTerm == null || searchTerm == "") {
-    message.reply("You need to add something after !play for me to search.");
-    return;
-  }
-  // Only try to join the sender's voice channel if they are in one themselves
-  if (message.member.voiceChannel) {
-    YoutubeSearch(searchTerm);
-    message.member.voiceChannel
-      .join()
-      .then(connection => {
-        console.log(ytAudioQueue);
-        if (ytAudioQueue.length > 1) {
-          ytAudioQueue.pop();
-          console.log(ytAudioQueue);
-          PlayStream(ytAudioQueue[0]);
-          message.channel.send("Now playing...\n" + ytAudioQueue[0]);
-        }
-      })
-      .catch(console.log);
-  } else {
-    message.reply("You need to join a voice channel first!");
-  }
-};
-
-/* END COMMAND HANDLERS */
-
-/* METHODS */
-
-YoutubeSearch = searchKeywords => {
-  axios
-    .get(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${escape(
-        searchKeywords
-      )}&`,
-      { params: { key: process.env.YT_API_KEY } }
-    )
-    .then(response => {
-      var body = response.data.items;
-      if (body.length == 0) {
-        console.log("Your search gave 0 results");
-        return videoId;
-      }
-      console.log(body[0].id.videoId);
-      for (var item of body) {
-        if (item.id.kind === "youtube#video") {
-          QueueYtAudioStream(item.id.videoId);
-        }
-      }
-      // console.log(response.data.items)
-    })
-    .catch(error => {
-      console.log(err); //Axios entire error message
-      console.log(err.response.data.error); //Google API error message
-      console.log("Unexpected error when searching YouTube");
-      return null;
-    });
-  return null;
-};
-
-QueueYtAudioStream = videoId => {
-  var streamUrl = `https://www.youtube.com/watch?v=${videoId}`;
-  ytAudioQueue.push(streamUrl);
-};
-
-PlayStream = streamUrl => {
-  const streamOptions = { seek: 0, volume: 1 };
-  console.log("Streaming audio from " + streamUrl);
-
-  if (streamUrl) {
-    const stream = ytdl(streamUrl, { filter: "audioonly" });
-    var dispatcher = bot.voiceConnections
-      .first()
-      .playStream(stream, streamOptions);
-    dispatcher.on("end", () => {
-      dispatcher = null;
-      PlayNextStreamInQueue();
-    });
-  }
-};
-
-/* END METHODS */
 
 bot.login(process.env.BOT_TOKEN);

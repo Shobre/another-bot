@@ -1,6 +1,9 @@
 const commando = require("discord.js-commando");
 const axios = require("axios");
 const discord = require("discord.js");
+const BnetStrategy = require('passport-bnet').Strategy;
+const BNET_ID = process.env.BNET_ID
+const BNET_SECRET = process.env.BNET_SECRET
 
 class PvpCommand extends commando.Command {
   constructor(client) {
